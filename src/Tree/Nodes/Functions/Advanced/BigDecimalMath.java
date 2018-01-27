@@ -96,14 +96,7 @@ public class BigDecimalMath {
 	 * @return <code>true</code> if the value can be represented as <code>double</code> value 
 	 */
 	public static boolean isDoubleValue(BigDecimal value) {
-		if (value.compareTo(DOUBLE_MAX_VALUE) > 0) {
-			return false;
-		}
-		if (value.compareTo(DOUBLE_MAX_VALUE.negate()) < 0) {
-			return false;
-		}
-
-		return true;
+		return value.compareTo(DOUBLE_MAX_VALUE) <= 0 && value.compareTo(DOUBLE_MAX_VALUE.negate()) >= 0;
 	}
 	
 	/**

@@ -10,7 +10,6 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import Tree.Nodes.Functions.Advanced.*;
-import Tree.Nodes.Functions.Advanced.stream.*;
 
 /**
  * Provides constructor methods for streams of {@link BigDecimal} elements. 

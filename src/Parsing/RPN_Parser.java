@@ -2,7 +2,6 @@ package Parsing;
 
 import Tree.Nodes.Functions.*;
 import Tree.Nodes.Matchers.Any;
-import Tree.Nodes.Matchers.Matcher;
 import Tree.Nodes.Operands.Constants.E;
 import Tree.Nodes.Operands.Constants.I;
 import Tree.Nodes.Operands.Constants.Pi;

@@ -1,11 +1,7 @@
 package Tree.Nodes.Matchers;
 
-import Tree.Nodes.Operands.Fraction;
-import Tree.Nodes.Primitives.Leaf;
 import Tree.Nodes.Primitives.Node;
 import Tree.Nodes.Type;
-
-import java.math.BigDecimal;
 
 public class Any extends Matcher {
 

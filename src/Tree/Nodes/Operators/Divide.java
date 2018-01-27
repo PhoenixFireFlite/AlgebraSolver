@@ -5,7 +5,6 @@ import Tree.Nodes.Primitives.Binary;
 import Tree.Nodes.Primitives.Node;
 import Tree.Nodes.Type;
 import Tree.Nodes.CONSTANTS;
-import Tree.Nodes.NodeType;
 
 import java.math.BigDecimal;
 

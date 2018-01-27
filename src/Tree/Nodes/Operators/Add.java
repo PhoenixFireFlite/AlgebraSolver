@@ -4,12 +4,11 @@ import Tree.Nodes.Operands.Fraction;
 import Tree.Nodes.Primitives.Nary;
 import Tree.Nodes.Primitives.Node;
 import Tree.Nodes.Type;
-import Tree.Nodes.NodeType;
 
 import java.math.BigDecimal;
 
 public class Add extends Nary{
-    
+
     public Add(Node... nodes){
         super(nodes);
     }

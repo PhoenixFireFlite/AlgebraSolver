@@ -3,7 +3,6 @@ package Tree.Nodes.Functions;
 import Tree.Nodes.CONSTANTS;
 import Tree.Nodes.Functions.Advanced.BigDecimalMath;
 import Tree.Nodes.Operands.Fraction;
-import Tree.Nodes.Operators.Power;
 import Tree.Nodes.Primitives.Binary;
 import Tree.Nodes.Primitives.Node;
 import Tree.Nodes.Type;

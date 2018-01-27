@@ -2,7 +2,6 @@ package Tree.Nodes.Operands;
 
 import Tree.Nodes.CONSTANTS;
 import Tree.Nodes.Functions.Advanced.BigDecimalMath;
-import Tree.Nodes.Operands.Constants.E;
 import Tree.Nodes.Primitives.Leaf;
 import Tree.Nodes.Primitives.Node;
 import Tree.Nodes.Type;

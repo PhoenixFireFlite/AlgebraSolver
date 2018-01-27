@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Tree.Nodes.Functions.Advanced.*;
-import Tree.Nodes.Functions.Advanced.stream.*;
 
 /**
  * Utility class to calculate taylor series efficiently until the maximum error (as defined by the precision in the {@link MathContext} is reached.
