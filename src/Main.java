@@ -1,4 +1,7 @@
+import Simplifying.Rule;
 import Tree.Tree;
+
+import java.util.HashMap;
 
 //1           = ~0.004 secs
 //10          = ~0.006 secs
@@ -16,6 +19,7 @@ public class Main {
 
     public static void main(String args[]){
         testParser();
+        testMatcher();
 //        for(int i=0;i<100000;i++)
 //            new Tree(test);
 //        long start = System.nanoTime(); // 3.5 - 2.3 secs
@@ -23,10 +27,11 @@ public class Main {
 //            new Tree(test);
 //        System.out.println((System.nanoTime()-start)/1000000000.0+" secs");
 
-        Tree tree1 = new Tree("(-b+sqrt(b^2-4ac))/(2a)");
-        Tree tree2 = new Tree("(sqrt(b^2-4ca)-b)/(2a)");
+        Tree tree = new Tree("x/y+(u+3)/y");
 
-        System.out.println(tree1.getRoot().equalTo(tree2.getRoot()));
+//        long start = System.nanoTime();
+//        System.out.println(Simplifier.simplify(tree));
+//        System.out.println((System.nanoTime()-start)/1000000000.0);
 
 //        System.out.println("Fraction: "+tree.getFractionalValueString());
 //        System.out.println("Decimal: "+tree.getDecimalValueString());
@@ -35,6 +40,32 @@ public class Main {
 
     private static void testParser(){
         new Tree(test);
+    }
+
+    private static void testMatcher(){
+        HashMap<Integer, Boolean> tests = new HashMap<>();
+
+        tests.put(1, (new Rule(":any(a)+0",":any(a)").matches(new Tree("x+0").getRoot())).getValidity());
+        tests.put(2, !(new Rule(":any(a)+0",":any(a)").matches(new Tree("x").getRoot())).getValidity());
+
+        tests.put(3, (new Rule(":any(a)/1",":any(a)").matches(new Tree("x/1").getRoot())).getValidity());
+        tests.put(4, !(new Rule(":any(a)/1",":any(a)").matches(new Tree("x").getRoot())).getValidity());
+
+        tests.put(5, (new Rule("(:any(a)/:any(b))/:any(c)","(:any(a)/(:any(b)*:any(c)))").matches(new Tree("(x/y)/z").getRoot())).getValidity());
+        tests.put(6, !(new Rule("(:any(a)/:any(b))/:any(c)","(:any(a)/(:any(b)*:any(c)))").matches(new Tree("x/y").getRoot())).getValidity());
+
+        tests.put(7, (new Rule(":any(a)*(:any(b)/:any(c))","(:any(a)*:any(b))/:any(c)").matches(new Tree("x*(a/b)").getRoot())).getValidity());
+        tests.put(8, !(new Rule(":any(a)*(:any(b)/:any(c))","(:any(a)*:any(b))/:any(c)").matches(new Tree("x*a").getRoot())).getValidity());
+
+        boolean failed = false;
+        for(int val: tests.keySet()){
+            if(!tests.get(val)) {
+                System.err.println("Failed Matcher Test! : " + val);
+                failed = true;
+            }
+        }
+        if(!failed)
+            System.out.println("Matcher Tests Succeeded!");
     }
 
 }

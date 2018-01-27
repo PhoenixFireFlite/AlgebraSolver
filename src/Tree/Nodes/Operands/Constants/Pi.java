@@ -30,6 +30,10 @@ public class Pi extends Leaf {
 
     public Fraction getFractionalValue() { return Pi_fraction; }
 
+    public Node getCopy(){
+        return new Pi();
+    }
+
     public Type getType(){
         return Type.Pi;
     }

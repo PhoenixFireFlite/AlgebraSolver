@@ -25,6 +25,10 @@ public class I extends Leaf {
 
     public Fraction getFractionalValue() { return null; }
 
+    public Node getCopy(){
+        return new I();
+    }
+
     public Type getType(){
         return Type.I;
     }

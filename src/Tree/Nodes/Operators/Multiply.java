@@ -39,8 +39,12 @@ public class Multiply extends Nary{
         return sum;
     }
 
-    public Node getEmptyCopy() {
-        return new Multiply();
+    public Node getCopy() {
+        Node[] children = getChildren();
+        for(int i=0;i<children.length;i++){
+            children[i] = children[i].getCopy();
+        }
+        return new Multiply(children);
     }
 
     public String getTypeString(){

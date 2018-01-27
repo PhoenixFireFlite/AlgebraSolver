@@ -7,14 +7,13 @@ public abstract class Nary extends Node{
 
     private ArrayList<Node> children = new ArrayList<>();
 
-    public Nary(){}
     public Nary(Node... nodes){
         addChildren(nodes);
     }
     public Nary(Node[]... nodess) {for(Node[] n: nodess) {addChildren(n);}}
     public Nary(Node[] nodeArray, Node node) {addChildren(nodeArray);addChild(node);}
 
-    public void addChildren(Node... nodes){
+    private void addChildren(Node... nodes){
         for(Node node: nodes)
             addChild(node);
     }
@@ -23,7 +22,7 @@ public abstract class Nary extends Node{
         children.clear();
     }
 
-    public void addChild(Node node){
+    private void addChild(Node node){
         if(node.getType() == getType()){
             addChildren(node.getChildren());
         }else {
@@ -60,13 +59,26 @@ public abstract class Nary extends Node{
         return builder.toString();
     }
 
+    public void setChildTo(Node from, Node to){
+        for(int i=0;i<children.size();i++){
+            Node child = children.get(i);
+            if(child.equalTo(from))
+                children.set(i, to);
+        }
+    }
+
     public Node[] getChildren(){
         Node[] a = new Node[children.size()];
         return children.toArray(a);
     }
+
+    public ArrayList<Node> getChildrenAsList(){
+        return children;
+    }
+
     public int getChildrenCount() {return children.size();}
 
-    public abstract Node getEmptyCopy();
+    public abstract Node getCopy();
 
     public NodeType getNodeType(){
         return NodeType.Nary;

@@ -31,8 +31,8 @@ public class Tan extends Unary {
         return "Tan("+getChildren()[0]+")";
     }
 
-    public Node getEmptyCopy() {
-        return new Tan();
+    public Node getCopy() {
+        return new Tan(getChildren()[0].getCopy());
     }
 
     public String getTypeString(){

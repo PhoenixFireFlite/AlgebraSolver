@@ -31,8 +31,8 @@ public class Sec extends Unary {
         return "Sec("+getChildren()[0]+")";
     }
 
-    public Node getEmptyCopy() {
-        return new Sec();
+    public Node getCopy() {
+        return new Sec(getChildren()[0].getCopy());
     }
 
     public String getTypeString(){

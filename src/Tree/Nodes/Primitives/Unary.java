@@ -11,9 +11,14 @@ public abstract class Unary extends Node{
         setChild(node);
     }
 
-    public void setChild(Node node){
+    private void setChild(Node node){
         node.setParent(this);
         children[0] = node;
+    }
+
+    public void setChildTo(Node from, Node to){
+        if(children[0].equalTo(from))
+            setChild(to);
     }
 
     public Node[] getChildren(){
@@ -21,7 +26,7 @@ public abstract class Unary extends Node{
     }
     public int getChildrenCount() {return 1;}
 
-    public abstract Node getEmptyCopy();
+    public abstract Node getCopy();
 
     public NodeType getNodeType(){
         return NodeType.Unary;

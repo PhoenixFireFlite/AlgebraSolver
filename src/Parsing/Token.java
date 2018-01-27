@@ -2,11 +2,12 @@ package Parsing;
 
 public class Token{
 
-    public static enum Type{
+    public enum Type{
         NUMBER,
         CONSTANT,
         OPERATOR,
         VARIABLE,
+        MATCHER,
         LEFT_PARENTHESIS,
         RIGHT_PARENTHESIS,
         FUNCTION,
@@ -16,7 +17,7 @@ public class Token{
     private String string;
     private Type type;
 
-    public Token(String string, Type type){
+    Token(String string, Type type){
         this.string = string;
         this.type = type;
     }

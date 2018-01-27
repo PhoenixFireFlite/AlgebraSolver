@@ -6,10 +6,10 @@ public abstract class Leaf extends Node{
     @Override
     public abstract int sameTypeCompare(Node node);
 
-    public Node[] getChildren(){
-        return null;
-    }
+    public void setChildTo(Node from, Node to){}
+    public Node[] getChildren(){ return null; }
     public int getChildrenCount() {return 0;}
     public NodeType getNodeType(){ return NodeType.Leaf; }
+    public abstract Node getCopy();
 
 }

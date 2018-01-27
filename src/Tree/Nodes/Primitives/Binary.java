@@ -5,12 +5,12 @@ public abstract class Binary extends Node{
 
     private Node[] children = new Node[2];
 
-    public Binary(){}
+    protected Binary(){}
     public Binary(Node a, Node b){
         setChildren(a, b);
     }
 
-    public void setChildren(Node a, Node b){
+    private void setChildren(Node a, Node b){
         a.setParent(this);
         b.setParent(this);
 
@@ -33,12 +33,23 @@ public abstract class Binary extends Node{
         return a+str+b;
     }
 
+    public void setChildTo(Node from, Node to){
+        if(children[0].equalTo(from)){
+            to.setParent(this);
+            children[0] = to;
+        }
+        if(children[1].equalTo(from)){
+            to.setParent(this);
+            children[1] = to;
+        }
+    }
+
     public Node[] getChildren(){
         return children;
     }
     public int getChildrenCount() {return 2;}
 
-    public abstract Node getEmptyCopy();
+    public abstract Node getCopy();
 
     public NodeType getNodeType(){
         return NodeType.Binary;

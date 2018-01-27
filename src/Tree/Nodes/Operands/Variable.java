@@ -29,6 +29,10 @@ public class Variable extends Leaf {
 
     public Fraction getFractionalValue() { return null; }
 
+    public Node getCopy(){
+        return new Variable(name);
+    }
+
     public Type getType(){
         return Type.Variable;
     }
