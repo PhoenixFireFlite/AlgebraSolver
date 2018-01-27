@@ -1,4 +1,5 @@
 import Simplifying.Rule;
+import Simplifying.Simplifier;
 import Tree.Tree;
 
 import java.util.HashMap;
@@ -27,7 +28,8 @@ public class Main {
 //            new Tree(test);
 //        System.out.println((System.nanoTime()-start)/1000000000.0+" secs");
 
-        Tree tree = new Tree("x/y+(u+3)/y");
+        Tree tree = new Tree("x/1");
+        Simplifier.simplify(tree);
 
 //        long start = System.nanoTime();
 //        System.out.println(Simplifier.simplify(tree));

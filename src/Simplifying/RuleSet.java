@@ -9,10 +9,10 @@ class RuleSet {
 
     static{
 //        rules.add(new Rule("0/:any(a)","0"));
-//        rules.add(new Rule(":any(a)/1",":any(a)"));
+        rules.add(new Rule(":any(a)/1",":any(a)"));
 //        rules.add(new Rule(":any(a)+:any(a)+0",":any(a)"));
 //        rules.add(new Rule("(:any(a)+:any(b))/:any(a)", "1+:any(b)/:any(a)"));
-        rules.add(new Rule(":any(a)/:any(b)+:any(c)/:any(b)","(:any(a)+:any(c))/:any(b)"));
+//        rules.add(new Rule(":any(a)/:any(b)+:any(c)/:any(b)","(:any(a)+:any(c))/:any(b)"));
     }
 
     public static Rule getMatchingRule(Tree tree){
