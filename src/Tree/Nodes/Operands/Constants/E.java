@@ -30,6 +30,10 @@ public class E extends Leaf {
 
     public Fraction getFractionalValue() { return E_fraction; }
 
+    public Node getCopy(){
+        return new E();
+    }
+
     public Type getType(){
         return Type.E;
     }

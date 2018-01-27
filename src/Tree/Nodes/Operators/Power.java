@@ -49,8 +49,9 @@ public class Power extends Binary {
         return a+"^"+b;
     }
 
-    public Node getEmptyCopy() {
-        return new Power();
+    public Node getCopy() {
+        Node[] children = getChildren();
+        return new Power(children[0].getCopy(),children[1].getCopy());
     }
 
     public String getTypeString(){

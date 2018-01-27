@@ -1,6 +1,8 @@
 package Parsing;
 
 import Tree.Nodes.Functions.*;
+import Tree.Nodes.Matchers.Any;
+import Tree.Nodes.Matchers.Matcher;
 import Tree.Nodes.Operands.Constants.E;
 import Tree.Nodes.Operands.Constants.I;
 import Tree.Nodes.Operands.Constants.Pi;
@@ -20,7 +22,9 @@ import static Parsing.Token.Type.*;
 
 public class RPN_Parser {
 
-    private static String[] functions = new String[]{"sin","cos","tan","csc","sec","cot","sqrt","root"};
+    private static String[] functions = new String[]{
+            "sin","cos","tan","csc","sec","cot","sqrt","root",
+            ":any"};
     private static String[] constants = new String[]{"pi","e","i"};
 
     private static int getPrecedence(Token t){
@@ -51,7 +55,7 @@ public class RPN_Parser {
                 }
 
                 dex = NUMBER;
-            } else if(Character.isLetter(c)){ // VARIABLE
+            } else if(Character.isLetter(c) || c == ':'){ // VARIABLE
                 if(builder.toString().equals("-") && dex == NUMBER)
                     builder.append("1");
 
@@ -86,13 +90,13 @@ public class RPN_Parser {
                     for(;j<functions.length;j++){
                         if(variableMash.endsWith(functions[j])) break;
                     }
-                    if(j == functions.length){
-                        for(char var: variableMash.toCharArray()){
+                    if(j == functions.length){ // Not Function
+                        for (char var : variableMash.toCharArray()) {
                             tokens.add(new Token(Character.toString(var), VARIABLE));
                             tokens.add(new Token("*", OPERATOR));
                         }
-                        tokens.remove(tokens.size()-1);
-                    }else{
+                        tokens.remove(tokens.size() - 1);
+                    }else{ // Is Function
                         if(variableMash.length()-functions[j].length() != 0){
                             String vars = variableMash.substring(0, variableMash.length()-functions[j].length());
                             for(char var: vars.toCharArray()){
@@ -100,9 +104,10 @@ public class RPN_Parser {
                                 tokens.add(new Token("*", OPERATOR));
                             }
                         }
-
-                        tokens.add(new Token(functions[j], FUNCTION));
-
+                        if(variableMash.charAt(0) == ':')
+                            tokens.add(new Token(functions[j].substring(1), MATCHER));
+                        else
+                            tokens.add(new Token(functions[j], FUNCTION));
                         dex = FUNCTION;
                     }
                 }else{
@@ -116,11 +121,12 @@ public class RPN_Parser {
                 dex = LEFT_PARENTHESIS;
             } else if(c == ')') { // RIGHT_PARENTHESIS
                 if(dex == VARIABLE){
-                    for(char var: builder.toString().toCharArray()){
+                    String variableMash = builder.toString();
+                    for (char var : variableMash.toCharArray()) {
                         tokens.add(new Token(Character.toString(var), VARIABLE));
                         tokens.add(new Token("*", OPERATOR));
                     }
-                    tokens.remove(tokens.size()-1);
+                    tokens.remove(tokens.size() - 1);
                 }else {
                     tokens.add(new Token(builder.toString(), dex));
                 }
@@ -130,11 +136,12 @@ public class RPN_Parser {
             } else { // OPERATOR
                 if (dex != OPERATOR) {
                     if(dex == VARIABLE){
-                        for(char var: builder.toString().toCharArray()){
+                        String variableMash = builder.toString();
+                        for (char var : variableMash.toCharArray()) {
                             tokens.add(new Token(Character.toString(var), VARIABLE));
                             tokens.add(new Token("*", OPERATOR));
                         }
-                        tokens.remove(tokens.size()-1);
+                        tokens.remove(tokens.size() - 1);
                     }else {
                         tokens.add(new Token(builder.toString(), dex));
                     }
@@ -159,11 +166,12 @@ public class RPN_Parser {
             tokens.remove(0);
 
         if(dex == VARIABLE){
-            for(char var: builder.toString().toCharArray()){
+            String variableMash = builder.toString();
+            for (char var : variableMash.toCharArray()) {
                 tokens.add(new Token(Character.toString(var), VARIABLE));
                 tokens.add(new Token("*", OPERATOR));
             }
-            tokens.remove(tokens.size()-1);
+            tokens.remove(tokens.size() - 1);
         }else {
             tokens.add(new Token(builder.toString(), dex));
         }
@@ -190,6 +198,7 @@ public class RPN_Parser {
                         }
                         stack.push(t);
                         break;
+                    case MATCHER:
                     case FUNCTION:
                     case LEFT_PARENTHESIS:
                         stack.push(t);
@@ -200,7 +209,7 @@ public class RPN_Parser {
 
                         stack.pop();
 
-                        if (!stack.isEmpty() && stack.peek().getType() == FUNCTION)
+                        if (!stack.isEmpty() && (stack.peek().getType() == FUNCTION || stack.peek().getType() == MATCHER))
                             queue.add(stack.pop());
 
                         break;
@@ -214,7 +223,7 @@ public class RPN_Parser {
 
                         break;
                     default:
-                        System.err.println("ERROR: " + t.getString());
+                        System.err.println("ERROR: " + t.getString()+" ["+t.getType()+"]");
                         break;
                 }
             }
@@ -282,6 +291,17 @@ public class RPN_Parser {
                                 a = stack.pop();
                                 stack.push(new Power(a, b));
                                 break;
+                        }
+                        break;
+                    case MATCHER:
+                        switch (token.getString()) {
+                            case "any":
+                                a = stack.pop();
+                                if(a.toString().length() > 1)
+                                    System.err.println("Pattern name data loss!");
+                                stack.push(new Any(a.toString().charAt(0)));
+                                break;
+                            default: System.err.println("Unknown Matcher: "+token.getString());
                         }
                         break;
                     case FUNCTION:

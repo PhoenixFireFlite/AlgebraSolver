@@ -31,8 +31,8 @@ public class Cot extends Unary {
         return "Cot("+getChildren()[0]+")";
     }
 
-    public Node getEmptyCopy() {
-        return new Cot();
+    public Node getCopy() {
+        return new Cot(getChildren()[0].getCopy());
     }
 
     public String getTypeString(){

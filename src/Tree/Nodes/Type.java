@@ -28,4 +28,7 @@ public enum Type {
     // Other Functions
     Sqrt,
     Root,
+
+    // Matchers (ALWAYS LAST)
+    Any,
 }

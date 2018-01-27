@@ -2,6 +2,7 @@ package Tree.Nodes.Operands;
 
 import Tree.Nodes.CONSTANTS;
 import Tree.Nodes.Functions.Advanced.BigDecimalMath;
+import Tree.Nodes.Operands.Constants.E;
 import Tree.Nodes.Primitives.Leaf;
 import Tree.Nodes.Primitives.Node;
 import Tree.Nodes.Type;
@@ -146,6 +147,10 @@ public class Fraction extends Leaf {
 
     private static boolean notequal(BigInteger a, BigInteger b){
         return a.compareTo(b) != 0;
+    }
+
+    public Node getCopy(){
+        return new Fraction(numerator,denominator);
     }
 
     @Override

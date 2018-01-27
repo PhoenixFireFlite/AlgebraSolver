@@ -29,8 +29,8 @@ public class Cos extends Unary {
         return "Cos("+getChildren()[0]+")";
     }
 
-    public Node getEmptyCopy() {
-        return new Cos();
+    public Node getCopy() {
+        return new Cos(getChildren()[0].getCopy());
     }
 
     public String getTypeString(){

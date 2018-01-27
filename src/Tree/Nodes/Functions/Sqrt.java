@@ -34,8 +34,8 @@ public class Sqrt extends Unary {
         return "Sqrt("+getChildren()[0]+")";
     }
 
-    public Node getEmptyCopy() {
-        return new Sqrt();
+    public Node getCopy() {
+        return new Sqrt(getChildren()[0].getCopy());
     }
 
     public String getTypeString(){

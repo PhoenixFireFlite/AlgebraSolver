@@ -32,8 +32,9 @@ public class Divide extends Binary {
         return aVal.divide(bVal);
     }
 
-    public Node getEmptyCopy() {
-        return new Divide();
+    public Node getCopy() {
+        Node[] children = getChildren();
+        return new Divide(children[0].getCopy(),children[1].getCopy());
     }
 
     public String getTypeString(){

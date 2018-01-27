@@ -31,8 +31,8 @@ public class Csc extends Unary {
         return "Csc("+getChildren()[0]+")";
     }
 
-    public Node getEmptyCopy() {
-        return new Csc();
+    public Node getCopy() {
+        return new Csc(getChildren()[0].getCopy());
     }
 
     public String getTypeString(){

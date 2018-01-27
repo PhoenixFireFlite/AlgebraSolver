@@ -29,8 +29,8 @@ public class Sin extends Unary {
         return new Fraction(getDecimalValue());
     }
 
-    public Node getEmptyCopy() {
-        return new Sin();
+    public Node getCopy() {
+        return new Sin(getChildren()[0].getCopy());
     }
 
     public String getTypeString(){
