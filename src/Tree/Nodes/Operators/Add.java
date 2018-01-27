@@ -9,8 +9,7 @@ import Tree.Nodes.NodeType;
 import java.math.BigDecimal;
 
 public class Add extends Nary{
-
-    public Add(){}
+    
     public Add(Node... nodes){
         super(nodes);
     }

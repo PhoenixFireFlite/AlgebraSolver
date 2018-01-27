@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 
 public class Multiply extends Nary{
 
-    public Multiply(){}
     public Multiply(Node... nodes){
         super(nodes);
     }
