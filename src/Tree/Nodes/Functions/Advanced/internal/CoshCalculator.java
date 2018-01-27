@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 
 import Tree.Nodes.Functions.Advanced.*;
-import Tree.Nodes.Functions.Advanced.stream.*;
 
 /**
  * Calculates cosinus hyperbolicus using the Taylor series.

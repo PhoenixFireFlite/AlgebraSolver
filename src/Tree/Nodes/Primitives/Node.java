@@ -109,6 +109,10 @@ public abstract class Node {
                     case Leaf:
                         return response.setMatch(sameTypeEquals(matchNode));
 
+                    case Unary:
+                        break;
+                    case Binary:
+                        break;
                     case Nary:
                         Queue<Node> patternQueue = new LinkedList<>(((Nary) matchNode).getChildrenAsList());
                         ArrayList<Node> compareToList = ((Nary) this).getChildrenAsList();
