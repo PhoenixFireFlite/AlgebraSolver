@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="Algebra Simplifier:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Algebra_Simplifier_jar</output-path>
+    <root id="archive" name="Algebra Simplifier.jar">
+      <element id="module-output" name="Algebra Simplifier" />
+    </root>
+  </artifact>
+</component>

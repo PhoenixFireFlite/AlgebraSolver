@@ -20,6 +20,13 @@ public abstract class Matcher extends Leaf {
         return name;
     }
 
+    public boolean matcherMatches(Node node){
+        switch(getType()){
+            case Any: return true;
+            default: return false;
+        }
+    }
+
     public abstract int sameTypeCompare(Node node);
     public abstract String toString();
     public abstract String getTypeString();

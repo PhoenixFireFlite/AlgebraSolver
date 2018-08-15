@@ -76,6 +76,14 @@ public abstract class Nary extends Node{
         return children;
     }
 
+    public ArrayList<Node> getClonedChildrenAsList(){
+        ArrayList<Node> list = new ArrayList<>();
+        for(Node child: children){
+            list.add(child.getCopy());
+        }
+        return list;
+    }
+
     public int getChildrenCount() {return children.size();}
 
     public abstract Node getCopy();

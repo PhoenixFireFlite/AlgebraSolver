@@ -23,7 +23,7 @@ public class Pi extends Leaf {
     public boolean sameTypeEquals(Node node) { return true; }
 
     public String getTypeString(){
-        return "Pi";
+        return "PI";
     }
 
     public BigDecimal getDecimalValue() { return Pi_value; }

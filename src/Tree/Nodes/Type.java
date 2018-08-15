@@ -30,5 +30,6 @@ public enum Type {
     Root,
 
     // Matchers (ALWAYS LAST)
+    Scope,
     Any,
 }

@@ -1,5 +1,6 @@
 package Parsing;
 
+import Exceptions.*;
 import Tree.Nodes.Functions.*;
 import Tree.Nodes.Matchers.Any;
 import Tree.Nodes.Operands.Constants.E;
@@ -69,6 +70,11 @@ public class RPN_Parser {
                     if(s.equals(varMash+c)){
                         found = true;
                         break;
+                    } else if(s.equals((varMash+c).toLowerCase())){
+                        builder = new StringBuilder(builder.toString().toLowerCase());
+                        c = Character.toLowerCase(c);
+                        found = true;
+                        break;
                     }
                 }
 
@@ -84,7 +90,7 @@ public class RPN_Parser {
                     builder.append("1");
 
                 if(dex == VARIABLE) {
-                    String variableMash = builder.toString();
+                    String variableMash = builder.toString().toLowerCase();
                     int j = 0;
                     for(;j<functions.length;j++){
                         if(variableMash.endsWith(functions[j])) break;
@@ -231,39 +237,38 @@ public class RPN_Parser {
                 queue.add(stack.pop());
 
         }catch (EmptyStackException x){
-            System.err.println("Expression format exception");
+            System.err.println("Expression format exception: 1");
         }
 
         return queue;
     }
 
-    public static Node assembleTree(ArrayList<Token> tokens){
+    public static Node assembleTree(ArrayList<Token> tokens) throws Exception{
         Stack<Node> stack = new Stack<>();
 
-        try {
-            for (Token token : tokens) {
-                switch (token.getType()) {
-                    case VARIABLE:
-                        if(token.toString().length() > 1)
-                            System.err.println("Variable name data loss!");
-                        stack.push(new Variable(token.toString().charAt(0)));
-                        break;
-                    case NUMBER:
-                        try {
-                            stack.push(new Fraction(token.toString()));
-                        } catch (Exception x) {
-                            System.err.println("Number parse error: " + token);
-                            return null;
-                        }
-                        break;
-                    case CONSTANT:
-                        switch (token.getString()){
-                            case "pi": stack.push(new Pi()); break;
-                            case "e":  stack.push(new E()); break;
-                            case "i":  stack.push(new I()); break;
-                        }
-                    case OPERATOR:
-                        Node a, b;
+        for (Token token : tokens) {
+            switch (token.getType()) {
+                case VARIABLE:
+                    if(token.toString().length() > 1)
+                        throw new VariableNameTooLongException(token.toString());
+                    stack.push(new Variable(token.toString().charAt(0)));
+                    break;
+                case NUMBER:
+                    try {
+                        stack.push(new Fraction(token.toString()));
+                    } catch (Exception x) {
+                        throw new ErrorParsingFractionException(token.toString());
+                    }
+                    break;
+                case CONSTANT:
+                    switch (token.getString()){
+                        case "pi": stack.push(new Pi()); break;
+                        case "e":  stack.push(new E()); break;
+                        case "i":  stack.push(new I()); break;
+                    }
+                case OPERATOR:
+                    Node a, b;
+                    try {
                         switch (token.getString()) {
                             case "+":
                                 b = stack.pop();
@@ -291,19 +296,23 @@ public class RPN_Parser {
                                 stack.push(new Power(a, b));
                                 break;
                         }
-                        break;
-                    case MATCHER:
-                        switch (token.getString()) {
-                            case "any":
-                                a = stack.pop();
-                                if(a.toString().length() > 1)
-                                    System.err.println("Pattern name data loss!");
-                                stack.push(new Any(a.toString().charAt(0)));
-                                break;
-                            default: System.err.println("Unknown Matcher: "+token.getString());
-                        }
-                        break;
-                    case FUNCTION:
+                    }catch(EmptyStackException e){
+                        throw new InsufficientParametersException(token.getString(), 2);
+                    }
+                    break;
+                case MATCHER:
+                    switch (token.getString()) {
+                        case "any":
+                            a = stack.pop();
+                            if(a.toString().length() > 1)
+                                throw new VariableNameTooLongException(token.toString());
+                            stack.push(new Any(a.toString().charAt(0)));
+                            break;
+                        default: throw new UnknownMatcherFunctionException(token.getString());
+                    }
+                    break;
+                case FUNCTION:
+                    try{
                         switch (token.getString()) {
                             case "sin":
                                 stack.push(new Sin(stack.pop()));
@@ -327,24 +336,26 @@ public class RPN_Parser {
                                 stack.push(new Sqrt(stack.pop()));
                                 break;
                             case "root":
+                                if(stack.size() < 2) throw new InsufficientParametersException("root", 2);
                                 b = stack.pop();
                                 a = stack.pop();
                                 stack.push(new Root(a, b));
                                 break;
-                            default: System.err.println("Unknown Function: "+token.getString());
+                            default: throw new UnknownFunctionException(token.getString());
                         }
-                        break;
-                    default:
-                        System.err.println("ERROR: " + token.toString());
-                }
+                    }catch(EmptyStackException e){
+                        throw new InsufficientParametersException(token.getString(), 1);
+                    }
+                    break;
+                default:
+                    throw new UnknownTokenTypeException();
             }
-        }catch(EmptyStackException e){
-            System.err.println("Expression format exception");
-            return null;
         }
 
-        if(stack.size() != 1)
-            System.err.println("Stack error!");
+        if(stack.size() > 1)
+            throw new TooManyParametersException(stack.toString());
+        else if(stack.size() < 1)
+            throw new EmptyExpressionException();
 
         return stack.pop();
     }

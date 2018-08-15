@@ -30,6 +30,6 @@ public class Any extends Matcher {
     }
 
     public String toString(){
-        return "ANY("+name+")";
+        return ":ANY("+name+")";
     }
 }
