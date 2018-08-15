@@ -1,5 +1,6 @@
 package Tree;
 
+import Exceptions.EmptyTreeStringException;
 import Parsing.RPN_Parser;
 import Parsing.Token;
 import Simplifying.MatchResponse;
@@ -14,9 +15,15 @@ public class Tree {
 
     private Node rootnode;
 
-    public Tree(String string){ setTree(string); }
+    public Tree(String string){
+        try{
+            setTree(string);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
-    public void setTree(String string){
+    public void setTree(String string) throws Exception{
         if(string.length() > 0) {
             ArrayList<Token> tokens = RPN_Parser.toPostfix(RPN_Parser.tokenize(string));
             if (tokens.size() > 0) {
@@ -26,13 +33,24 @@ public class Tree {
                     node.setTree(this);
                 }
             }
+        }else{
+            throw new EmptyTreeStringException();
         }
     }
 
     public boolean matches(Tree tree){
         MatchResponse b = rootnode.matches(tree.rootnode);
-        System.out.println(b.getMap());
-        return b.getValidity();
+
+        System.out.println("\n"+((b.checkValidity())?"Match Found":"No Matches Found"));
+        System.out.println("Variable Possibilities: "+b.getMap()+"\n");
+
+        boolean good = b.hasPossibleSolution();
+
+        if(!good){
+            System.out.println("FAIL FAIL FAIL");
+        }
+
+        return b.checkValidity();
     }
 
     public BigDecimal getDecimalValue(){
@@ -75,9 +93,17 @@ public class Tree {
         return value.toString();
     }
 
+    public boolean equalTo(Tree tree){
+        return rootnode.equalTo(tree.rootnode);
+    }
+
     public void printTree(){
         if(rootnode != null)
             System.out.println(rootnode.getBranches());
+    }
+
+    public void printInfix(){
+        System.out.println(toString());
     }
 
     public String toString(){

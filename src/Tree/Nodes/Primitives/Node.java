@@ -2,6 +2,7 @@ package Tree.Nodes.Primitives;
 
 import Simplifying.MatchResponse;
 import Tree.Nodes.Matchers.Matcher;
+import Tree.Nodes.Matchers.Scope;
 import Tree.Nodes.NodeType;
 import Tree.Nodes.Operands.Fraction;
 import Tree.Nodes.Type;
@@ -18,11 +19,11 @@ public abstract class Node {
     private Tree tree;
     public boolean isMatcher = false;
 
-    Node(){
-        ID = setID();
+    protected Node(){
+        ID = nextID();
     }
 
-    private static long setID() { return ID_COUNTER++; }
+    private static long nextID() { return ID_COUNTER++; }
 
     private static String stringRepeat(String toRepeat, int times){
         StringBuilder sb = new StringBuilder("");
@@ -33,7 +34,7 @@ public abstract class Node {
     }
 
     private String toString_recursive(Node node, int depth){
-        StringBuilder sb = new StringBuilder("");
+        StringBuilder sb = new StringBuilder();
 
         String spacing = stringRepeat(" ",depth-1);
         spacing += (depth == 0)? "" : "|";
@@ -49,12 +50,33 @@ public abstract class Node {
         return sb.toString();
     }
 
-    public int compare(Node node){
+    int compare(Node node){
         int diff = getType().ordinal() - node.getType().ordinal();
         if(diff == 0){
             return sameTypeCompare(node);
         }else
             return (diff > 0)? -1 : 1;
+    }
+
+    private Node getEqualNode(Node node, Node[] nodes){
+        for(Node n: nodes){
+            if(n.equalTo(node))
+                return n;
+        }
+        return null;
+    }
+
+    private ArrayList<Node> getEqualNodes(ArrayList<Node> nodes1, Node[] nodes){
+        ArrayList<Node> equalNodes = new ArrayList<>();
+        for(Node node: nodes1) {
+            for (Node n : nodes) {
+                if (n.equalTo(node)) {
+                    equalNodes.add(n);
+                    break;
+                }
+            }
+        }
+        return equalNodes;
     }
 
     public int sameTypeCompare(Node node){
@@ -90,91 +112,106 @@ public abstract class Node {
     }
 
     public MatchResponse matches(Node matchNode){
-        return matches(matchNode, new MatchResponse());
+        return matches(matchNode, new MatchResponse(), new Scope());
     }
 
-    private MatchResponse matches(Node matchNode, MatchResponse response){
-        if(!response.getValidity()) // If response has failed, stop searching
+    private MatchResponse matches(Node matchNode, MatchResponse response, Scope scope){
+        if(!response.checkValidity())
             return response;
 
         else if(matchNode.isMatcher){
-            return matcherMatches((Matcher)matchNode, this) ? // If matcher matches node, add variable to response, else set to failure
-                    response.addPossibility(((Matcher) matchNode).getName(), this) :
+            // If matcher matches node, add variable to response, else set to failure
+            return ((Matcher)matchNode).matcherMatches(this) ?
+                    response.addUnaryPossibility((Matcher) matchNode, this, scope) :
                     response.setMatch(false);
-        }
+        }// GOING TO NEED TO CHANGE BECAUSE OF SCOPE CONSIDERATIONS **************************************************************************
 
         else{
+            // If this node and pattern are the same type
             if(getType() == matchNode.getType()){
                 switch (getNodeType()) {
+                    // If nodes are leaf and are totally equal, return corresponding boolean
                     case Leaf:
-                        return response.setMatch(sameTypeEquals(matchNode));
+                        if(sameTypeEquals(matchNode)){
+                            response.addNonPatternMatch(this);
+                            return response.setMatch(true);
+                        }else{
+                            return response.setMatch(false);
+                        }
+                    // If nodes are not commutative, check if each of their children are totally equal
+                    case Binary:
+                    case Unary:
+                        Node[] nodeChildren = matchNode.getChildren();
+                        Node[] children = getChildren();
+                        for (int i = 0; i < getChildrenCount(); i++) {
+                            if (!children[i].matches(nodeChildren[i], response, scope).checkValidity())
+                                return response.setMatch(false);
+                        }
+                        return response;
+                    // If nodes are commutative, do this crap
                     case Nary:
-                        Queue<Node> patternQueue = new LinkedList<>(((Nary) matchNode).getChildrenAsList());
-                        ArrayList<Node> compareToList = ((Nary) this).getChildrenAsList();
-
-//                        System.out.println("Starting:\n  Queue: "+patternQueue + "\n  Compare: " + compareToList);
+                        Queue<Node> patternList = new LinkedList<>(((Nary) matchNode).getClonedChildrenAsList());
+                        ArrayList<Node> compareToList = ((Nary) this).getClonedChildrenAsList();
 
                         xx:
-                        while (!patternQueue.isEmpty()) {
-                            Node pattern = patternQueue.peek(); // Get next pattern
-                            if(pattern.isMatcher){
+                        while (!patternList.isEmpty()) {
+                            Node pattern = patternList.peek();
+
+                            if(pattern.isMatcher){ // TODO: Ensure this method still words if mpattern doesn't match all nodes in compareToList
                                 ArrayList<Node> matches = new ArrayList<>();
 
                                 for (Node compare : compareToList) {
-                                    if (matcherMatches((Matcher) pattern, compare)) {
+                                    if (((Matcher)pattern).matcherMatches(compare)) {
                                         matches.add(compare);
                                     }
                                 }
 
-                                if(matches.size() == 0){
-//                                    System.out.println("FAIL");
+                                if(matches.size() == 0)
                                     return response.setMatch(false);
-                                }
 
-                                if(!response.addPossibility(((Matcher)pattern).getName(), matches).getValidity())
+                                //TODO: see if I can add way to use the checkValidity() here, otherwise, remove the check all together
+                                // Use getEqualNodes to get original nodes with original ids
+                                if(!response.addNaryPossibilities((Matcher)pattern, getEqualNodes(matches, getChildren()), this).checkValidity())
                                     return response;
 
-                                patternQueue.remove();
-
+                                patternList.remove();
                             }else {
+                                boolean anyFound = false;
+                                Scope newScope = new Scope();
+
                                 for(int i=0;i<compareToList.size();i++){
-                                    Node compare = compareToList.get(i);
-                                    response.setMatch(true);
-                                    if (compare.matches(pattern, response).getValidity()) {
-                                        patternQueue.remove();
-                                        compareToList.remove(i);
-                                        continue xx;
+//                                     Get state of response variable so we can revert back if no match was found
+                                    // TODO: also have to clone nonPatternMatches list
+                                    HashMap<Character, HashMap<Node, ArrayList<Node>>> responseMapClone =
+                                            (HashMap<Character, HashMap<Node, ArrayList<Node>>>) response.getMap().clone();
+
+                                    // Use getEqualNode to get original node with original id
+                                    if (getEqualNode(compareToList.get(i),getChildren()).matches(pattern, response, newScope).checkValidity()) {
+                                        if(pattern.getNodeType() == NodeType.Leaf) {
+                                            compareToList.remove(i);
+                                            patternList.remove();
+                                            continue xx;
+                                        }
+                                        anyFound = true;
+                                    }else {
+//                                         Reset response variable
+                                        response.setMap(responseMapClone);
+                                        response.setMatch(true);
                                     }
                                 }
-//                                System.out.println("FAIL");
-                                return response.setMatch(false);
+                                if(!anyFound)
+                                    return response.setMatch(false);
+                                else
+                                    patternList.remove();
                             }
                         }
 
-//                        System.out.println("Left over:\n  Compare: " + compareToList);
-
-                        return response;
-
-                    default:  // Binary or Unary
-                        Node[] nodeChildren = matchNode.getChildren();
-                        Node[] children = getChildren();
-                        for (int i = 0; i < getChildrenCount(); i++) {
-                            if (!children[i].matches(nodeChildren[i], response).getValidity())
-                                return response.setMatch(false);
-                        }
                         return response;
                 }
             }
         }
 
         return response.setMatch(false);
-    }
-
-    private static boolean matcherMatches(Matcher matcher, Node node){
-        switch(matcher.getType()){
-            case Any: return true;
-            default: System.err.println("Invalid Matcher String: "+matcher.getTypeString()); return false;
-        }
     }
 
     public void setTo(Node node){
